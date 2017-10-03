@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package edu.wctc.distjava.lgt.bookwebapp.model;
 
 import java.sql.Connection;
@@ -6,13 +11,16 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-public class MySqlDataAccess implements DataAccess {
+/**
+ *
+ * @author Leslee
+ */
+public class MsSqlServerDataAccess implements DataAccess {
     private final int ALL_RECORDS = 0;
 
     private Connection conn;
@@ -23,7 +31,7 @@ public class MySqlDataAccess implements DataAccess {
     private String userName;
     private String password;
     
-    public MySqlDataAccess(String driverClass, 
+    public MsSqlServerDataAccess(String driverClass, 
             String url, String userName, String password) {
         
         setDriverClass(driverClass);
@@ -33,6 +41,7 @@ public class MySqlDataAccess implements DataAccess {
         
     }
     
+    @Override
     public void openConnection() 
             throws ClassNotFoundException, SQLException {
         
@@ -40,6 +49,7 @@ public class MySqlDataAccess implements DataAccess {
         conn = DriverManager.getConnection(url, userName, password);
     }
     
+    @Override
     public void closeConnection() throws SQLException {
         if(conn !=null) conn.close();
     }
@@ -51,6 +61,7 @@ public class MySqlDataAccess implements DataAccess {
      * @return
      * @throws SQLException 
      */
+    @Override
     public List<Map<String,Object>> getAllRecords(String tableName, int maxRecords) 
             throws SQLException, ClassNotFoundException {
         
@@ -58,7 +69,7 @@ public class MySqlDataAccess implements DataAccess {
         String sql = "";
         
         if(maxRecords > ALL_RECORDS) {
-            sql = "select * from " + tableName + " limit " + maxRecords;
+            sql = "select TOP " + maxRecords + " * from " + tableName;
         } else {
             sql = "select * from " + tableName;
         }
@@ -84,47 +95,55 @@ public class MySqlDataAccess implements DataAccess {
         return rawData;
     }
 
+    @Override
     public String getDriverClass() {
         return driverClass;
     }
 
+    @Override
     public final void setDriverClass(String driverClass) {
         this.driverClass = driverClass;
     }
 
+    @Override
     public String getUrl() {
         return url;
     }
 
+    @Override
     public void setUrl(String url) {
         this.url = url;
     }
 
+    @Override
     public String getUserName() {
         return userName;
     }
 
+    @Override
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
 
+    @Override
     public void setPassword(String password) {
         this.password = password;
     }
     
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         
-        DataAccess db = new MySqlDataAccess(
-                "org.apache.derby.jdbc.ClientDriver",
-                "jdbc:derby://localhost:1527/sample",
-                "app", "app"
+        MsSqlServerDataAccess db = new MsSqlServerDataAccess(
+                "com.mysql.jdbc.Driver",
+                "jdbc:mysql://localhost:3306/book",
+                "root", "admin"
         );
         
-        List<Map<String,Object>> list = db.getAllRecords("CUSTOMER", 0);
+        List<Map<String,Object>> list = db.getAllRecords("author", 0);
         
         for(Map<String,Object> rec : list) {
             System.out.println(rec);
@@ -133,3 +152,4 @@ public class MySqlDataAccess implements DataAccess {
     }
     
 }
+
