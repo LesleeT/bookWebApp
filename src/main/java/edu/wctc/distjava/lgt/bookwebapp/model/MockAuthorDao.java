@@ -52,6 +52,11 @@ public class MockAuthorDao implements IAuthorDao {
             System.out.println(a.getAuthorId() + ", " + a.getAuthorName() + ", " + a.getDateAdded() + "\n");
         }
     }
+
+    @Override
+    public int removeAuthorById(Integer id) throws ClassNotFoundException, SQLException {
+        return 1;
+    }
  
 }
    

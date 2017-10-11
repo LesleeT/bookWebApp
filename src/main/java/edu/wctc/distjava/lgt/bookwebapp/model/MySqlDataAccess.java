@@ -2,134 +2,190 @@ package edu.wctc.distjava.lgt.bookwebapp.model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.Vector;
 
 public class MySqlDataAccess implements DataAccess {
+
     private final int ALL_RECORDS = 0;
+    private final boolean DEBUG = true;
 
     private Connection conn;
     private Statement stmt;
     private ResultSet rs;
-    private String driverClass;
-    private String url;
-    private String userName;
-    private String password;
-    
-    public MySqlDataAccess(String driverClass, 
-            String url, String userName, String password) {
-        
-        setDriverClass(driverClass);
-        setUrl(url);
-        setUserName(userName);
-        setPassword(password);
-        
-    }
-    
-    public void openConnection() 
+    private PreparedStatement pstmt;
+
+    public void openConnection(String driverClass,
+            String url, String userName, String password)
             throws ClassNotFoundException, SQLException {
-        
-        Class.forName (driverClass);
+
+        Class.forName(driverClass);
         conn = DriverManager.getConnection(url, userName, password);
     }
-    
+
     public void closeConnection() throws SQLException {
-        if(conn !=null) conn.close();
+        if (conn != null) {
+            conn.close();
+        }
     }
-    
+
+    @Override
+    public final int updateRecord(String tableName, List<String> colNames, List<Object> colValues, String pkField, Object pkValue)
+            throws ClassNotFoundException, SQLException {
+        String sql = "UPDATE " + tableName + " SET ";// + colNames + " = ? WHERE " + pkField + " = ?";
+        //update does not use parentheses in string joiner
+        StringJoiner sj = new StringJoiner(", ", "", "");
+        for (String col : colNames) {
+            sj.add(col + " = ? ");
+        }
+
+        sql += sj.toString();
+
+        //sj is full of data-must clear it by recreating it
+        sj = new StringJoiner(" ", "", "");
+        for (Object value : colValues) {
+            sj.add("");
+        }
+
+        sql += " WHERE " + pkField + " = ?";
+        //sql += sj.toString();
+
+        if (DEBUG) {
+            System.out.println(sql);
+        }
+        
+        pstmt = conn.prepareStatement(sql);
+        for (int i = 1; i <= colValues.size(); i++) {
+            pstmt.setObject(i, colValues.get(i - 1));
+        }
+
+        pstmt.setObject(3, pkValue);
+
+        return pstmt.executeUpdate();
+    }
+
+    @Override
+    public final int createRecord(String tableName, List<String> colNames, List<Object> colValues)
+            throws ClassNotFoundException, SQLException {
+
+        String sql = "INSERT INTO " + tableName + " ";
+        StringJoiner sj = new StringJoiner(", ", "(", ")");
+        for (String col : colNames) {
+            sj.add(col);
+        }
+
+        sql += sj.toString();
+        sql += " VALUES ";
+
+        //sj is full of data-must clear it by recreating it
+        sj = new StringJoiner(", ", "(", ")");
+        for (Object value : colValues) {
+            sj.add("?");
+        }
+        sql += sj.toString();
+        if (DEBUG) {
+            System.out.println(sql);
+        }
+
+        pstmt = conn.prepareStatement(sql);
+        for (int i = 1; i <= colValues.size(); i++) {
+            pstmt.setObject(i, colValues.get(i - 1));
+        }
+
+        return pstmt.executeUpdate();
+    }
+
     /**
      * Returns records from a table. Requires and open connection.
+     *
      * @param tableName
      * @param maxRecords
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
-    public List<Map<String,Object>> getAllRecords(String tableName, int maxRecords) 
+    public final int deleteRecordById(String tableName, String pkColName, Object pkValue)
+            throws ClassNotFoundException, SQLException {
+        String sql = "DELETE FROM" + tableName + "WHERE" + pkColName + " = ? ";
+
+        pstmt = conn.prepareStatement(sql);
+        pstmt.setObject(1, pkValue);
+        //int recsDeleted = pstmt.executeUpdate();
+
+        return pstmt.executeUpdate();
+    }
+
+    public final List<Map<String, Object>> getAllRecords(String tableName, int maxRecords)
             throws SQLException, ClassNotFoundException {
-        
-        List<Map<String,Object>> rawData = new Vector<>();
+
+        List<Map<String, Object>> rawData = new Vector<>();
         String sql = "";
-        
-        if(maxRecords > ALL_RECORDS) {
+
+        if (maxRecords > ALL_RECORDS) {
             sql = "select * from " + tableName + " limit " + maxRecords;
         } else {
             sql = "select * from " + tableName;
         }
-        
-        openConnection();
+
         stmt = conn.createStatement();
         rs = stmt.executeQuery(sql);
-        
+
         ResultSetMetaData rsmd = rs.getMetaData();
         int colCount = rsmd.getColumnCount();
-        Map<String,Object> record = null;
-        
-        while( rs.next() ) {
+        Map<String, Object> record = null;
+
+        while (rs.next()) {
             record = new LinkedHashMap<>();
-            for(int colNum=1; colNum <= colCount; colNum++) {
+            for (int colNum = 1; colNum <= colCount; colNum++) {
                 record.put(rsmd.getColumnName(colNum), rs.getObject(colNum));
             }
             rawData.add(record);
         }
-        
-        closeConnection();
-        
+
         return rawData;
     }
 
-    public String getDriverClass() {
-        return driverClass;
-    }
-
-    public final void setDriverClass(String driverClass) {
-        this.driverClass = driverClass;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        
-        DataAccess db = new MySqlDataAccess(
-                "org.apache.derby.jdbc.ClientDriver",
-                "jdbc:derby://localhost:1527/sample",
-                "app", "app"
-        );
-        
-        List<Map<String,Object>> list = db.getAllRecords("CUSTOMER", 0);
-        
-        for(Map<String,Object> rec : list) {
-            System.out.println(rec);
-        }
-        
+
+        DataAccess db = new MySqlDataAccess();
+
+        db.openConnection("com.mysql.jdbc.Driver",
+                "jdbc:mysql://localhost:3306/book",
+                "root", "admin");
+
+        //update
+        int recsUpdated = db.updateRecord("author",
+                Arrays.asList("author_name", "date_added"),
+                Arrays.asList("Happy Gilmore", new java.util.Date()),
+                "author_id", 5);
+
+        db.closeConnection();
+        System.out.println("Recs updated " + recsUpdated);
+
+        //create
+//        int recsAdded = db.createRecord("author",
+//                Arrays.asList("author_name","date_added"),
+//                Arrays.asList("Star Shine","2010-02-11"));
+//
+//        db.closeConnection();
+//        System.out.println("Recs created " + recsAdded);
+        //delete
+        //int recsDeleted = db.deleteRecordById("author", "author_id", 25);
+        //System.out.println("Number of records deleted: " + recsDeleted);
+        //retrieve
+        //List<Map<String, Object>> list = db.getAllRecords("CUSTOMER", 0);
+        //for (Map<String, Object> rec : list) {
+        //  System.out.println(rec);
+        //  db.closeConnection();
     }
-    
+
 }

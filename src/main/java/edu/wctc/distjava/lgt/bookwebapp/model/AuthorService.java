@@ -16,16 +16,25 @@ import java.util.List;
  * @author Leslee
  */
 public class AuthorService {
+
     private IAuthorDao authorDao;
-    
-    public AuthorService(IAuthorDao authorDao){
+
+    public AuthorService(IAuthorDao authorDao) {
         setAuthorDao(authorDao);
     }
 
-    public List<Author> getAuthorList() throws SQLException, ClassNotFoundException{
+    public final int removeAuthorById(String id) throws ClassNotFoundException, SQLException, NumberFormatException {
+        if (id == null || id != "") {
+            throw new IllegalArgumentException("I.D. must be a whole number greater than zero.");
+        }
+        Integer value = Integer.parseInt(id);
+        return authorDao.removeAuthorById(value);
+    }
+
+    public List<Author> getAuthorList() throws SQLException, ClassNotFoundException {
         return authorDao.getListOfAuthors();
     }
- 
+
     public IAuthorDao getAuthorDao() {
         return authorDao;
     }
@@ -33,20 +42,22 @@ public class AuthorService {
     public void setAuthorDao(IAuthorDao authorDao) {
         this.authorDao = authorDao;
     }
-    
+
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         IAuthorDao dao = new AuthorDao(
-                 "com.mysql.jdbc.Driver",
+                "com.mysql.jdbc.Driver",
                 "jdbc:mysql://localhost:3306/book",
                 "root", "admin",
-                new MySqlDataAccess( "com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost:3306/book",
-                "root", "admin"));
+                new MySqlDataAccess()
+        );
         AuthorService authorService = new AuthorService(dao);
-        List <Author> list = authorService.getAuthorList();
-        for(Author a : list){
+        
+        int recsDeleted = authorService.removeAuthorById("6");
+        
+        List<Author> list = authorService.getAuthorList();
+        for (Author a : list) {
             System.out.println(a.getAuthorId() + ", " + a.getAuthorName() + ", " + a.getDateAdded() + "\n");
         }
     }
-        
+
 }

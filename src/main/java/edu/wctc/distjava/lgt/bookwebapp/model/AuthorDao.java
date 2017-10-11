@@ -6,6 +6,7 @@
 package edu.wctc.distjava.lgt.bookwebapp.model;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,9 @@ public class AuthorDao implements IAuthorDao {
     private String userName;
     private String password;
     private DataAccess db;
+    private final String AUTHOR_TBL = "author";
+    private final String AUTHOR_PK = "author_id";
+  
 
     public AuthorDao(String driverClass, String url,
             String userName, String password,
@@ -34,20 +38,57 @@ public class AuthorDao implements IAuthorDao {
         setDb(db);
     }
 
+    public final int removeAuthorById(Integer id) throws ClassNotFoundException, SQLException {
+        if (id == null || id < 1) {
+            throw new IllegalArgumentException("Id must be a whole number greater than zero.");
+        }
+
+        db.openConnection(driverClass, url, userName, password);
+
+        int recsDeleted = db.deleteRecordById(AUTHOR_TBL, AUTHOR_PK, id);
+
+        db.closeConnection();
+
+        return recsDeleted;
+    }
+    
+     public final int addAuthor(String tableName, List<String> colName, List<Object> colValues) 
+             throws ClassNotFoundException, SQLException {
+       db.openConnection(driverClass, url, userName, password);
+       int addAuthorResult = db.createRecord(AUTHOR_TBL, colName, colValues);
+            
+       db.closeConnection();
+       return addAuthorResult; 
+      
+    }
+     
+     public final int updateAuthor(String tableName, List<String> colNames, List<Object> colValues, String pkField, 
+             Object pkValue)throws ClassNotFoundException, SQLException{
+         db.openConnection(driverClass, url, userName, password);
+         
+         int updateResult = db.updateRecord(AUTHOR_TBL, colNames, colValues, AUTHOR_PK, pkValue);
+         
+         db.closeConnection();
+         return updateResult;
+         
+     }
+
     @Override
-    public List<Author> getListOfAuthors()
+    public final List<Author> getListOfAuthors()
             throws SQLException, ClassNotFoundException {
+
+        db.openConnection(driverClass, url, userName, password);
 
         List<Author> list = new Vector<>();
         List<Map<String, Object>> rawData
-                = db.getAllRecords("author", 0);
+                = db.getAllRecords(AUTHOR_TBL, 0);
 
         Author author = null;
 
         for (Map<String, Object> rec : rawData) {
             author = new Author();
 
-            Object objRecId = rec.get("author_id");
+            Object objRecId = rec.get(AUTHOR_PK);
             Integer recId = objRecId == null
                     ? 0 : Integer.parseInt(objRecId.toString());
             author.setAuthorId(recId);
@@ -63,6 +104,7 @@ public class AuthorDao implements IAuthorDao {
             list.add(author);
 
         }
+        db.closeConnection();
 
         return list;
     }
@@ -107,22 +149,28 @@ public class AuthorDao implements IAuthorDao {
         this.password = password;
     }
 
- 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException{
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
         AuthorDao dao = new AuthorDao(
-                 "com.mysql.jdbc.Driver",
+                "com.mysql.jdbc.Driver",
                 "jdbc:mysql://localhost:3306/book",
                 "root", "admin",
-                new MySqlDataAccess( "com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost:3306/book",
-                "root", "admin")
+                new MySqlDataAccess()
         );
         
-        List <Author> list = dao.getListOfAuthors();
-        for(Author a : list){
-            System.out.println(a.getAuthorId() + ", " + a.getAuthorName() + ", " + a.getDateAdded() + "\n");
-        }
+        int updateAuth = dao.updateAuthor("author", 
+                Arrays.asList("author_name","date_added"),
+                Arrays.asList("Jane Austen", new java.util.Date()),
+                "author_id", 1);
+
+//        int addAuth = dao.addAuthor("author", 
+//                Arrays.asList("author_name", "date_added"),
+//                Arrays.asList("George Orwell", new java.util.Date()));
+        //int recsDeleted = dao.removeAuthorById(25);
+
+//        List<Author> list = dao.getListOfAuthors();
+//        for (Author a : list) {
+//            System.out.println(a.getAuthorId() + ", " + a.getAuthorName() + ", " + a.getDateAdded() + "\n");
+//        }
     }
- 
+
 }
-   
