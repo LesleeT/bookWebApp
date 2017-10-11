@@ -165,8 +165,8 @@ public class MySqlDataAccess implements DataAccess {
         //update
         int recsUpdated = db.updateRecord("author",
                 Arrays.asList("author_name", "date_added"),
-                Arrays.asList("Happy Gilmore", new java.util.Date()),
-                "author_id", 5);
+                Arrays.asList("Kurt Vonnegut", new java.util.Date()),
+                "author_id", 7);
 
         db.closeConnection();
         System.out.println("Recs updated " + recsUpdated);
@@ -178,9 +178,11 @@ public class MySqlDataAccess implements DataAccess {
 //
 //        db.closeConnection();
 //        System.out.println("Recs created " + recsAdded);
+
         //delete
         //int recsDeleted = db.deleteRecordById("author", "author_id", 25);
         //System.out.println("Number of records deleted: " + recsDeleted);
+        
         //retrieve
         //List<Map<String, Object>> list = db.getAllRecords("CUSTOMER", 0);
         //for (Map<String, Object> rec : list) {
