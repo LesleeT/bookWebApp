@@ -37,7 +37,11 @@ public interface DataAccess {
     public abstract int createRecord(String tableName, List<String> colNames, List<Object> colValues)
             throws ClassNotFoundException, SQLException;
 
-    public abstract int updateRecord (String tableName, List<String> colNames, List<Object> colValues, String pkField, Object pkValue ) 
+    public abstract int updateRecord(String tableName, List<String> colNames, List<Object> colValues, String pkField, Object pkValue)
             throws ClassNotFoundException, SQLException;
+
+    public abstract List<Map<String, Object>> findRecordById(String tableName,
+            String pkColName, Object pkValue)
+            throws SQLException;
 
 }

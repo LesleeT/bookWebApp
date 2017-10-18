@@ -25,6 +25,7 @@ public class MySqlDataAccess implements DataAccess {
     private ResultSet rs;
     private PreparedStatement pstmt;
 
+    @Override
     public void openConnection(String driverClass,
             String url, String userName, String password)
             throws ClassNotFoundException, SQLException {
@@ -33,6 +34,7 @@ public class MySqlDataAccess implements DataAccess {
         conn = DriverManager.getConnection(url, userName, password);
     }
 
+    @Override
     public void closeConnection() throws SQLException {
         if (conn != null) {
             conn.close();
@@ -42,7 +44,7 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public final int updateRecord(String tableName, List<String> colNames, List<Object> colValues, String pkField, Object pkValue)
             throws ClassNotFoundException, SQLException {
-        String sql = "UPDATE " + tableName + " SET ";// + colNames + " = ? WHERE " + pkField + " = ?";
+        String sql = "UPDATE " + tableName + " SET ";
         //update does not use parentheses in string joiner
         StringJoiner sj = new StringJoiner(", ", "", "");
         for (String col : colNames) {
@@ -63,7 +65,7 @@ public class MySqlDataAccess implements DataAccess {
         if (DEBUG) {
             System.out.println(sql);
         }
-        
+
         pstmt = conn.prepareStatement(sql);
         for (int i = 1; i <= colValues.size(); i++) {
             pstmt.setObject(i, colValues.get(i - 1));
@@ -113,6 +115,7 @@ public class MySqlDataAccess implements DataAccess {
      * @return
      * @throws SQLException
      */
+    @Override
     public final int deleteRecordById(String tableName, String pkColName, Object pkValue)
             throws ClassNotFoundException, SQLException {
         String sql = "DELETE FROM" + tableName + "WHERE" + pkColName + " = ? ";
@@ -124,6 +127,38 @@ public class MySqlDataAccess implements DataAccess {
         return pstmt.executeUpdate();
     }
 
+    public final List<Map<String, Object>> findRecordById(String tableName, String pkColName, Object pkValue) throws SQLException {
+
+        String sql = "SELECT * FROM " + tableName + "WHERE " + pkColName + " = ? ";
+
+        pstmt = conn.prepareCall(sql);
+        pstmt.setObject(1, pkValue);
+
+        if (DEBUG) { 
+            System.out.println(sql);
+        }
+
+        rs = pstmt.executeQuery();
+
+        Map<String, Object> record = new LinkedHashMap<>();
+
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int colCount = rsmd.getColumnCount();
+
+        List<Map<String, Object>> data = new Vector<>();
+
+        while (rs.next()) {
+            record = new LinkedHashMap<>();
+            for (int colNum = 1; colNum <= colCount; colNum++) {
+                record.put(rsmd.getColumnName(colNum), rs.getObject(colNum));
+            }
+            data.add(record);
+        }
+
+        return data;
+    }
+
+    @Override
     public final List<Map<String, Object>> getAllRecords(String tableName, int maxRecords)
             throws SQLException, ClassNotFoundException {
 
@@ -178,11 +213,9 @@ public class MySqlDataAccess implements DataAccess {
 //
 //        db.closeConnection();
 //        System.out.println("Recs created " + recsAdded);
-
         //delete
         //int recsDeleted = db.deleteRecordById("author", "author_id", 25);
         //System.out.println("Number of records deleted: " + recsDeleted);
-        
         //retrieve
         //List<Map<String, Object>> list = db.getAllRecords("CUSTOMER", 0);
         //for (Map<String, Object> rec : list) {

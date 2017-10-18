@@ -14,8 +14,15 @@ import java.util.List;
  */
 public interface IAuthorDao {
 
-    List<Author> getListOfAuthors() throws SQLException, ClassNotFoundException;
+    public abstract List<Author> getListOfAuthors() throws SQLException, ClassNotFoundException;
 
     public abstract int removeAuthorById(Integer id) throws ClassNotFoundException, SQLException;
+
+    public abstract int updateAuthor(List<String> colNames, List<Object> colValues, String pkField) throws ClassNotFoundException, SQLException;
+
+    public abstract int addAuthor(List<String> colName, List<Object> colValues)
+            throws ClassNotFoundException, SQLException;
+
+    public abstract Author findAuthorById(Object authorId) throws ClassNotFoundException, SQLException;
 
 }
