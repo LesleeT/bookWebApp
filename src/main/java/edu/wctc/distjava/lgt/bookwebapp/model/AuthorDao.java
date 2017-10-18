@@ -184,17 +184,17 @@ public class AuthorDao implements IAuthorDao {
         this.password = password;
     }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        AuthorDao dao = new AuthorDao(
-                "com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost:3306/book",
-                "root", "admin",
-                new MySqlDataAccess()
-        );
-        
-        int updateAuth = dao.updateAuthor(
-                Arrays.asList("author_name","date_added"),
-                Arrays.asList("Jane Austen", new java.util.Date()), "1");
+//    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+//        AuthorDao dao = new AuthorDao(
+//                "com.mysql.jdbc.Driver",
+//                "jdbc:mysql://localhost:3306/book",
+//                "root", "admin",
+//                new MySqlDataAccess()
+//        );
+//        
+//        int updateAuth = dao.updateAuthor(
+//                Arrays.asList("author_name","date_added"),
+//                Arrays.asList("Jane Smaine", new java.util.Date()), "6");
 
 //        int addAuth = dao.addAuthor("author", 
 //                Arrays.asList("author_name", "date_added"),
@@ -209,4 +209,4 @@ public class AuthorDao implements IAuthorDao {
 
  
 
-}
+

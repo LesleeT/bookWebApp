@@ -123,7 +123,7 @@ public class AuthorController extends HttpServlet {
 
                 String authorId = request.getParameter("author_id");
 
-                authorService.updateAuthor(colNames, colValues, authorId);
+                authorService.updateAuthor(colValues, authorId);
 
                 destination = DESTINATION_AUTHOR_LIST;
 

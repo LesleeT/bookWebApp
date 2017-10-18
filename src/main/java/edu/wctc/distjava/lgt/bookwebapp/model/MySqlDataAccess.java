@@ -46,6 +46,9 @@ public class MySqlDataAccess implements DataAccess {
             throws ClassNotFoundException, SQLException {
         String sql = "UPDATE " + tableName + " SET ";
         //update does not use parentheses in string joiner
+        List<String> cols = new ArrayList();
+        cols.add("author_name");
+        cols.add("date_added");
         StringJoiner sj = new StringJoiner(", ", "", "");
         for (String col : colNames) {
             sj.add(col + " = ? ");
@@ -59,7 +62,7 @@ public class MySqlDataAccess implements DataAccess {
             sj.add("");
         }
 
-        sql += " WHERE " + pkField + " = ?";
+        sql += " WHERE " + pkField + " = ?;";
         //sql += sj.toString();
 
         if (DEBUG) {
@@ -71,8 +74,8 @@ public class MySqlDataAccess implements DataAccess {
             pstmt.setObject(i, colValues.get(i - 1));
         }
 
-        pstmt.setObject(3, pkValue);
-
+        pstmt.setObject(colValues.size() +1, pkValue);
+        System.out.println(sql);
         return pstmt.executeUpdate();
     }
 
@@ -118,12 +121,12 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public final int deleteRecordById(String tableName, String pkColName, Object pkValue)
             throws ClassNotFoundException, SQLException {
-        String sql = "DELETE FROM" + tableName + "WHERE" + pkColName + " = ? ";
+        String sql = "DELETE FROM " + tableName + " WHERE " + " author_id" + " = ? ";
 
         pstmt = conn.prepareStatement(sql);
         pstmt.setObject(1, pkValue);
         //int recsDeleted = pstmt.executeUpdate();
-
+        System.out.println(sql);
         return pstmt.executeUpdate();
     }
 
@@ -189,22 +192,22 @@ public class MySqlDataAccess implements DataAccess {
         return rawData;
     }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-
-        DataAccess db = new MySqlDataAccess();
-
-        db.openConnection("com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost:3306/book",
-                "root", "admin");
-
-        //update
-        int recsUpdated = db.updateRecord("author",
-                Arrays.asList("author_name", "date_added"),
-                Arrays.asList("Kurt Vonnegut", new java.util.Date()),
-                "author_id", 7);
-
-        db.closeConnection();
-        System.out.println("Recs updated " + recsUpdated);
+//    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+//
+//        DataAccess db = new MySqlDataAccess();
+//
+//        db.openConnection("com.mysql.jdbc.Driver",
+//                "jdbc:mysql://localhost:3306/book",
+//                "root", "admin");
+//
+//        //update
+//        int recsUpdated = db.updateRecord("author",
+//                Arrays.asList("author_name", "date_added"),
+//                Arrays.asList("Michael Brown", new java.util.Date()),
+//                "author_id", 31);
+//
+//        db.closeConnection();
+//        System.out.println("Recs updated " + recsUpdated);
 
         //create
 //        int recsAdded = db.createRecord("author",
@@ -223,4 +226,4 @@ public class MySqlDataAccess implements DataAccess {
         //  db.closeConnection();
     }
 
-}
+

@@ -40,9 +40,14 @@ public class AuthorService {
         return authorDao.getListOfAuthors();
     }
 
-    public final int updateAuthor(List<String> colNames, List<Object> colValues, String pkField)
+    public final int updateAuthor(List<Object> colValues, String pkField)
             throws ClassNotFoundException, SQLException {
-        return authorDao.updateAuthor(colNames, colValues, pkField);
+        //fix this later
+        List<String> cols = new ArrayList();
+        cols.add("author_name");
+        cols.add("date_added");
+        //change cols back to colNames
+        return authorDao.updateAuthor(cols, colValues, pkField);
     }
 
     public final Author findAuthorById(Object authorId)
@@ -70,12 +75,19 @@ public class AuthorService {
 //                new MySqlDataAccess()
 //        );
 //        AuthorService authorService = new AuthorService(dao);
+//        List<Object> vals = new ArrayList();
+//        vals.add("blah blah");
+//        vals.add(new Date());
+//        List<String> cols = new ArrayList();
+//        cols.add("author_name");
+//        cols.add("date_added");
+//        int recUpdate = authorService.updateAuthor(cols, vals, "6");
 //
-//        int recsDeleted = authorService.removeAuthorById("6");
+////        int recsDeleted = authorService.removeAuthorById("6");
 //
 //        List<Author> list = authorService.getAuthorList();
 //        for (Author a : list) {
 //            System.out.println(a.getAuthorId() + ", " + a.getAuthorName() + ", " + a.getDateAdded() + "\n");
 //        }
-//    }
-}
+    }
+
