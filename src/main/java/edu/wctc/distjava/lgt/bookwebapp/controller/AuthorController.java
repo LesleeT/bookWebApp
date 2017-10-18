@@ -82,6 +82,7 @@ public class AuthorController extends HttpServlet {
             } else if (action.equalsIgnoreCase(DELETE_ACTION)) {
                 String authorId = request.getParameter(AUTHOR_ID);
                 authorService.removeAuthorById(authorId);
+                
 
             } else if (action.equalsIgnoreCase(ADD_ACTION)) {
                 destination = DESTINATION_ADD_AUTHOR; 
@@ -126,14 +127,14 @@ public class AuthorController extends HttpServlet {
 
                 destination = DESTINATION_AUTHOR_LIST;
 
-                //getAuthorList(authorList, authorService, request);
-                 authorList = authorService.getAuthorList();
-                 request.setAttribute("authorList", authorList);
+                getAuthorList(authorList, authorService, request);
+                 //authorList = authorService.getAuthorList();
+                 //request.setAttribute("authorList", authorList);
             }
 
         } catch (Exception e) {
-            System.out.println("CAUGHT");
-            destination = "/authorList.jsp";
+            //System.out.println("CAUGHT");
+            //destination = "/authorList.jsp";
             request.setAttribute("errMessage", e.getMessage());
         }
 
@@ -143,8 +144,8 @@ public class AuthorController extends HttpServlet {
 
     public void getAuthorList(List<Author> authorList, AuthorService authServ, HttpServletRequest request)
             throws SQLException, ClassNotFoundException {
-//        authorList = authServ.getAuthorList();
-//        request.setAttribute("authorList", authorList);
+        authorList = authServ.getAuthorList();
+        request.setAttribute("authorList", authorList);
 
     }
 

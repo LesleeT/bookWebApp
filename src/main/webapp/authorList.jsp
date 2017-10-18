@@ -23,8 +23,9 @@
 
                         <td>${a.authorName}</td>
                         <td><fmt:formatDate pattern = "yyyy-MM-dd" value = "${a.dateAdded}"/></td>
-                        <td><input type="button" class="btn btn-info text-center" value="Edit" onclick="location.href = 'authorController?action=edit&authorId=${a.authorId}'"</td>
-                        <td><input type="button" class="btn btn-danger text-center" value="Delete" onclick="location.href = 'authorController?action=delete&authorId=${a.authorId}'"</td>
+                        <td>${a.authorId}</td>
+                        <td><input type="button" class="btn btn-info" value="Edit" onclick="location.href = 'authorController?action=edit&authorId=${a.authorId}'"</td>
+                        <td><input type="button" class="btn btn-danger" value="Delete" onclick="location.href = 'authorController?action=delete&authorId=${a.authorId}'"</td>
                     </tr> 
                 </c:forEach>
             </table> 
