@@ -13,7 +13,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        
+
         <title>Edit Author</title>
     </head>
     <body> <div class="container-fluid">
@@ -25,14 +25,17 @@
                     <form method ="POST" action = "${pageContext.request.contextPath}/authorController?action=editAuthor">
 
                         <input type="hidden" name="authorid" value="${eAuthor.authorId}">
-                               Author name:<br>
-                        <input type="text" name="author_name" value="${eAuthor.authorName}"><br>
+                        Author name:<br>
+                        <input type="text" name="author_name" value="${eAuthor.authorName}">
                         Date added:
-                        <input type="text" name="date_added" value="${eAuthor.dateAdded}"><br>
-                        <br>
+                        <input type="text" name="date_added" value="${eAuthor.dateAdded}">
+
                         <input type="submit" class="btn btn-success" name="submit" value="Submit">
                     </form>
                 </div>
+
+                <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
                 </body>
                 </html>

@@ -40,14 +40,14 @@ public class AuthorService {
         return authorDao.getListOfAuthors();
     }
 
-    public final int updateAuthor(List<Object> colValues, String pkField)
+    public final int updateAuthor(List<String> colNames, List<Object> colValues, String pkField)
             throws ClassNotFoundException, SQLException {
         //fix this later
-        List<String> cols = new ArrayList();
-        cols.add("author_name");
-        cols.add("date_added");
+        //List<String> cols = new ArrayList();
+        //cols.add("author_name");
+        //cols.add("date_added");
         //change cols back to colNames
-        return authorDao.updateAuthor(cols, colValues, pkField);
+        return authorDao.updateAuthor(colNames, colValues, pkField);
     }
 
     public final Author findAuthorById(Object authorId)
@@ -74,7 +74,14 @@ public class AuthorService {
 //                "root", "admin",
 //                new MySqlDataAccess()
 //        );
-//        AuthorService authorService = new AuthorService(dao);
+//         AuthorService authorService = new AuthorService(dao);
+//        int recsUpdated = authorService.updateAuthor(Arrays.asList("author_name", "date_added"), 
+//                Arrays.asList("Destiny Cornell", "2017-10-07"), "25");
+//        
+        
+//        System.out.println("Records Updated: " + recsUpdated);
+//        
+   
 //        List<Object> vals = new ArrayList();
 //        vals.add("blah blah");
 //        vals.add(new Date());

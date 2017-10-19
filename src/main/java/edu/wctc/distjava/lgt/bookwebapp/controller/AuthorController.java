@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
@@ -45,7 +46,6 @@ public class AuthorController extends HttpServlet {
     public static final String DESTINATION_AUTHOR_LIST = "/authorList.jsp";
     public static final String DESTINATION_ADD_AUTHOR = "/addAuthor.jsp";
     public static final String DESTINATION_EDIT_AUTHOR = "/editAuthor.jsp";
- 
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -82,10 +82,11 @@ public class AuthorController extends HttpServlet {
             } else if (action.equalsIgnoreCase(DELETE_ACTION)) {
                 String authorId = request.getParameter(AUTHOR_ID);
                 authorService.removeAuthorById(authorId);
-                
+
+                getAuthorList(authorList, authorService, request);
 
             } else if (action.equalsIgnoreCase(ADD_ACTION)) {
-                destination = DESTINATION_ADD_AUTHOR; 
+                destination = DESTINATION_ADD_AUTHOR;
 
             } else if (action.equalsIgnoreCase(SUBMIT_AUTHOR_ACTION)) {
                 List<String> colNames = new ArrayList();
@@ -101,7 +102,7 @@ public class AuthorController extends HttpServlet {
                 destination = DESTINATION_AUTHOR_LIST;
 
                 getAuthorList(authorList, authorService, request);
-                
+
             } else if (action.equalsIgnoreCase(EDIT_ACTION)) {
 
                 String authorId = request.getParameter(AUTHOR_ID);
@@ -112,24 +113,23 @@ public class AuthorController extends HttpServlet {
                 request.setAttribute("eAuthor", eAuthor);
 
             } else if (action.equalsIgnoreCase(EDIT_AUTHOR_ACTION)) {
-
-                List<String> colNames = new Vector();
+                //add 
+                List<String> colNames = new ArrayList();//Vector();
                 colNames.add(AUTHOR_NAME);
                 colNames.add(DATE_ADDED);
 
-                List<Object> colValues = new Vector();
+                List<Object> colValues = new ArrayList(); //Vector();
                 colValues.add(request.getParameter(AUTHOR_NAME));
                 colValues.add(new Date());
 
                 String authorId = request.getParameter("author_id");
 
-                authorService.updateAuthor(colValues, authorId);
+                authorService.updateAuthor(colNames, colValues, authorId);
 
                 destination = DESTINATION_AUTHOR_LIST;
 
                 getAuthorList(authorList, authorService, request);
-                 //authorList = authorService.getAuthorList();
-                 //request.setAttribute("authorList", authorList);
+
             }
 
         } catch (Exception e) {
