@@ -16,16 +16,18 @@
 
         <title>Edit Author</title>
     </head>
-    <body> <div class="container-fluid">
+    <body> 
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-2"></div>
                 <div class="col-sm-8">
                     <h1>Edit Author</h1>
 
-                    <form method ="POST" action = "${pageContext.request.contextPath}/authorController?action=editAuthor">
+                    <form method ="POST" 
+                          action = "${pageContext.request.contextPath}/authorController?action=editAuthor">
 
-                        <input type="hidden" name="authorid" value="${eAuthor.authorId}">
-                        Author name:<br>
+                        <input type="hidden" name="author_id" value="${eAuthor.authorId}">
+                        Author name:
                         <input type="text" name="author_name" value="${eAuthor.authorName}">
                         Date added:
                         <input type="text" name="date_added" value="${eAuthor.dateAdded}">
@@ -33,9 +35,10 @@
                         <input type="submit" class="btn btn-success" name="submit" value="Submit">
                     </form>
                 </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-                <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-                </body>
-                </html>
+    </body>
+</html>

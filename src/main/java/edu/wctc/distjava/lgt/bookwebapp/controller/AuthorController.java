@@ -39,7 +39,7 @@ public class AuthorController extends HttpServlet {
     public static final String DELETE_ACTION = "delete";
     public static final String EDIT_ACTION = "edit";
     public static final String SUBMIT_AUTHOR_ACTION = "submitauthor";
-    public static final String EDIT_AUTHOR_ACTION = "editAuthor";
+    public static final String EDIT = "editAuthor";
     public static final String AUTHOR_NAME = "author_name";
     public static final String DATE_ADDED = "date_added";
 
@@ -112,13 +112,13 @@ public class AuthorController extends HttpServlet {
                 Author eAuthor = authorService.findAuthorById(authorId);
                 request.setAttribute("eAuthor", eAuthor);
 
-            } else if (action.equalsIgnoreCase(EDIT_AUTHOR_ACTION)) {
+            } else if (action.equalsIgnoreCase(EDIT)) {
                 //add 
-                List<String> colNames = new ArrayList();//Vector();
+                List<String> colNames = new ArrayList();
                 colNames.add(AUTHOR_NAME);
                 colNames.add(DATE_ADDED);
 
-                List<Object> colValues = new ArrayList(); //Vector();
+                List<Object> colValues = new ArrayList(); 
                 colValues.add(request.getParameter(AUTHOR_NAME));
                 colValues.add(new Date());
 

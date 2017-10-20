@@ -132,7 +132,7 @@ public class MySqlDataAccess implements DataAccess {
 
     public final List<Map<String, Object>> findRecordById(String tableName, String pkColName, Object pkValue) throws SQLException {
 
-        String sql = "SELECT * FROM " + tableName + "WHERE " + pkColName + " = ? ";
+        String sql = "SELECT * FROM " + tableName + " WHERE " + pkColName + " = ? ";
 
         pstmt = conn.prepareCall(sql);
         pstmt.setObject(1, pkValue);
