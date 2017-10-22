@@ -47,6 +47,11 @@ public class AuthorController extends HttpServlet {
     public static final String DESTINATION_ADD_AUTHOR = "/addAuthor.jsp";
     public static final String DESTINATION_EDIT_AUTHOR = "/editAuthor.jsp";
 
+    private String driverClass;
+    private String url;
+    private String username;
+    private String password;
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -62,14 +67,15 @@ public class AuthorController extends HttpServlet {
         String destination = "/authorList.jsp";//default
         try {
 
-            IAuthorDao dao = new AuthorDao(
-                    "com.mysql.jdbc.Driver",
-                    "jdbc:mysql://localhost:3306/book",
-                    "root", "admin",
-                    new MySqlDataAccess()
-            );
+//            IAuthorDao dao = new AuthorDao(
+//                    "com.mysql.jdbc.Driver",
+//                    "jdbc:mysql://localhost:3306/book",
+//                    "root", "admin",
+//                    new MySqlDataAccess()
+//            );
 
-            AuthorService authorService = new AuthorService(dao);
+            AuthorService authorService = new AuthorService(new AuthorDao(driverClass, url, username, password,new MySqlDataAccess() ));
+            //AuthorService authorService = new AuthorService(dao);
 
             List<Author> authorList = null;
             String action = request.getParameter(ACTION);//key in the jsp page
@@ -118,7 +124,7 @@ public class AuthorController extends HttpServlet {
                 colNames.add(AUTHOR_NAME);
                 colNames.add(DATE_ADDED);
 
-                List<Object> colValues = new ArrayList(); 
+                List<Object> colValues = new ArrayList();
                 colValues.add(request.getParameter(AUTHOR_NAME));
                 colValues.add(new Date());
 
@@ -147,6 +153,14 @@ public class AuthorController extends HttpServlet {
         authorList = authServ.getAuthorList();
         request.setAttribute("authorList", authorList);
 
+    }
+
+    @Override
+    public void init() throws ServletException {
+        driverClass = getServletContext().getInitParameter("db.driver.class");
+        url = getServletContext().getInitParameter("db.url");
+        username = getServletContext().getInitParameter("db.username");
+        password = getServletContext().getInitParameter("db.password");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

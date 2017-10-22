@@ -33,6 +33,7 @@ public class AuthorDao implements IAuthorDao {
 
         setDriverClass(driverClass);
         setUrl(url);
+        
         setUserName(userName);
         setPassword(password);
         setDb(db);

@@ -15,6 +15,7 @@
         <title>Author List</title>
     </head>
     <body>
+          <jsp:include page = "header.jsp" /> 
         <h1>Author List</h1>
         <div>
             <table border ="1">
