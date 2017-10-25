@@ -60,6 +60,7 @@ public class AuthorController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String destination = "/authorList.jsp";//default
+        //dont use printwriter out b/c it overrides connection
         try {
 
             IAuthorDao dao = new AuthorDao(

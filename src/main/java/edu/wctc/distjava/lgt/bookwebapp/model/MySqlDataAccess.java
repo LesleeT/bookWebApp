@@ -199,7 +199,7 @@ public class MySqlDataAccess implements DataAccess {
 //        db.openConnection("com.mysql.jdbc.Driver",
 //                "jdbc:mysql://localhost:3306/book",
 //                "root", "admin");
-//
+////
 //        //update
 //        int recsUpdated = db.updateRecord("author",
 //                Arrays.asList("author_name", "date_added"),
@@ -217,13 +217,14 @@ public class MySqlDataAccess implements DataAccess {
 //        db.closeConnection();
 //        System.out.println("Recs created " + recsAdded);
         //delete
-        //int recsDeleted = db.deleteRecordById("author", "author_id", 25);
-        //System.out.println("Number of records deleted: " + recsDeleted);
+//        int recsDeleted = db.deleteRecordById("author", "author_id", 25);
+//        System.out.println("Number of records deleted: " + recsDeleted);
         //retrieve
         //List<Map<String, Object>> list = db.getAllRecords("CUSTOMER", 0);
         //for (Map<String, Object> rec : list) {
         //  System.out.println(rec);
         //  db.closeConnection();
+    //}
     }
 
 
