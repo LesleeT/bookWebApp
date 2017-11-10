@@ -9,12 +9,39 @@ package edu.wctc.distjava.lgt.bookwebapp.model;
  *
  * @author Leslee
  */
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 
-public class Author {
+@Entity
+//this says that this class maps to this tablename 
+@Table(name = "author")
+public class Author implements Serializable {
+
+    private static final long serialVersionUID = 1L;//L means it's a long integer
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "author_id")
     private Integer authorId;
+
+    @Size(max = 80)
+    @Column(name = "author_name")
     private String authorName;
+
+    @Column(name = "date_added")
+    @Temporal(TemporalType.DATE)
     private Date dateAdded;
 
     public Author() {
@@ -80,6 +107,5 @@ public class Author {
     public String toString() {
         return "Author{" + "authorId=" + authorId + ", authorName=" + authorName + ", dateAdded=" + dateAdded + '}';
     }
-    
-    
+
 }

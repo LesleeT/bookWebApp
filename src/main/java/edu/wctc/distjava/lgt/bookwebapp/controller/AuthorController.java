@@ -6,18 +6,17 @@
 package edu.wctc.distjava.lgt.bookwebapp.controller;
 
 import edu.wctc.distjava.lgt.bookwebapp.model.Author;
-import edu.wctc.distjava.lgt.bookwebapp.model.AuthorDao;
 import edu.wctc.distjava.lgt.bookwebapp.model.AuthorService;
-import edu.wctc.distjava.lgt.bookwebapp.model.IAuthorDao;
-import edu.wctc.distjava.lgt.bookwebapp.model.MySqlDataAccess;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
+import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,6 +30,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "AuthorController", urlPatterns = {"/authorController"})
 public class AuthorController extends HttpServlet {
+    
+    @EJB
+    private AuthorService authorService;
 
     public static final String ACTION = "action";
     public static final String LIST_ACTION = "list";
@@ -42,6 +44,7 @@ public class AuthorController extends HttpServlet {
     public static final String EDIT = "editAuthor";
     public static final String AUTHOR_NAME = "author_name";
     public static final String DATE_ADDED = "date_added";
+    public static final String AUTHORID = "author_id";
 
     public static final String DESTINATION_AUTHOR_LIST = "/authorList.jsp";
     public static final String DESTINATION_ADD_AUTHOR = "/addAuthor.jsp";
@@ -58,19 +61,10 @@ public class AuthorController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+       response.setContentType("text/html;charset=UTF-8");
         String destination = "/authorList.jsp";//default
         //dont use printwriter out b/c it overrides connection
         try {
-
-            IAuthorDao dao = new AuthorDao(
-                    "com.mysql.jdbc.Driver",
-                    "jdbc:mysql://localhost:3306/book",
-                    "root", "admin",
-                    new MySqlDataAccess()
-            );
-
-            AuthorService authorService = new AuthorService(dao);
 
             List<Author> authorList = null;
             String action = request.getParameter(ACTION);//key in the jsp page
@@ -79,7 +73,7 @@ public class AuthorController extends HttpServlet {
                 authorList = authorService.getAuthorList();
                 request.setAttribute("authorList", authorList);
                 getAuthorList(authorList, authorService, request);
-
+                
             } else if (action.equalsIgnoreCase(DELETE_ACTION)) {
                 String authorId = request.getParameter(AUTHOR_ID);
                 authorService.removeAuthorById(authorId);
@@ -90,19 +84,31 @@ public class AuthorController extends HttpServlet {
                 destination = DESTINATION_ADD_AUTHOR;
 
             } else if (action.equalsIgnoreCase(SUBMIT_AUTHOR_ACTION)) {
-                List<String> colNames = new ArrayList();
-                colNames.add(AUTHOR_NAME);
-                colNames.add(DATE_ADDED);
-
-                List<Object> colValues = new ArrayList();
-                colValues.add(request.getParameter(AUTHOR_NAME));
-                colValues.add(new Date());
-
-                authorService.addAuthor(colNames, colValues);
-
-                destination = DESTINATION_AUTHOR_LIST;
-
-                getAuthorList(authorList, authorService, request);
+                 String newName = request.getParameter(AUTHOR_NAME);
+                 String newDate = request.getParameter(DATE_ADDED);
+                 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                 Date temp = sdf.parse(newDate);
+                 
+                 authorService.addAuthor(newName);
+                 
+                 destination = DESTINATION_AUTHOR_LIST;
+                      
+                 getAuthorList(authorList, authorService, request);
+                                           
+//                List<String> colNames = new ArrayList();
+//                colNames.add(AUTHOR_NAME);
+//                colNames.add(DATE_ADDED);
+//                
+//
+//                List<Object> colValues = new ArrayList();
+//                colValues.add(request.getParameter(AUTHOR_NAME));
+//                colValues.add(new Date());
+//
+//                authorService.addAuthor(colNames, colValues);
+//
+//                destination = DESTINATION_AUTHOR_LIST;
+//
+//                getAuthorList(authorList, authorService, request);
 
             } else if (action.equalsIgnoreCase(EDIT_ACTION)) {
 
@@ -123,9 +129,9 @@ public class AuthorController extends HttpServlet {
                 colValues.add(request.getParameter(AUTHOR_NAME));
                 colValues.add(new Date());
 
-                String authorId = request.getParameter("author_id");
+                String authorId = request.getParameter(AUTHORID);
 
-                authorService.updateAuthor(colNames, colValues, authorId);
+                authorService.updateAuthor(AUTHOR_NAME, DATE_ADDED);
 
                 destination = DESTINATION_AUTHOR_LIST;
 
@@ -144,9 +150,14 @@ public class AuthorController extends HttpServlet {
     }
 
     public void getAuthorList(List<Author> authorList, AuthorService authServ, HttpServletRequest request)
-            throws SQLException, ClassNotFoundException {
+            throws SQLException, ClassNotFoundException, Exception {
         authorList = authServ.getAuthorList();
         request.setAttribute("authorList", authorList);
+
+   }
+    
+    @Override 
+    public void init() throws ServletException{
 
     }
 

@@ -5,49 +5,102 @@
  */
 package edu.wctc.distjava.lgt.bookwebapp.model;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 /**
  *
  * @author Leslee
  */
-public class AuthorService {
+@Stateless
+public class AuthorService implements Serializable {
 
-    private IAuthorDao authorDao;
+    private final String AUTHOR_TBL = "author";
+    private final String AUTHOR_PK = "author_id";
 
-    public AuthorService(IAuthorDao authorDao) {
-        setAuthorDao(authorDao);
+    @PersistenceContext(unitName = "book_PU")
+    private EntityManager em;
+
+    public EntityManager getEm() {
+        return em;
     }
 
-    public final int removeAuthorById(String id) throws ClassNotFoundException, SQLException, NumberFormatException {
-        if (id == null) {
-            throw new IllegalArgumentException("I.D. must be a whole number greater than zero.");
-        }
-        Integer value = Integer.parseInt(id);
-        return authorDao.removeAuthorById(value);
+    public void setEm(EntityManager em) {
+        this.em = em;
     }
 
-    public final int addAuthor(List<String> colName, List<Object> colValues)
-            throws ClassNotFoundException, SQLException {
-        return authorDao.addAuthor(colName, colValues);
+    public AuthorService() {
     }
 
-    public final List<Author> getAuthorList() throws SQLException, ClassNotFoundException {
-        return authorDao.getListOfAuthors();
+    // Updated for JPA
+    public List<Author> getAuthorList() throws Exception {
+
+        String jpql = "select a from Author a";
+        TypedQuery<Author> q = getEm().createQuery(jpql, Author.class);
+        q.setMaxResults(500); // optional
+
+        return q.getResultList();
+    }    
+    
+    //another way to delete author
+    //wont use this because typically you wont be passing an author object from the controller
+//    public void removeAuthor(Author author){
+//        getEm().remove(getEm().merge(author));//merge it with what's in cache, once merged then you can remove it      
+//    }
+//    
+
+    public int removeAuthorById(String id) throws Exception {
+        String jpql = "delete from Author a where a.authorId = :id";
+        Query q = getEm().createQuery(jpql);
+        q.setParameter("id", new Integer(id));
+        return q.executeUpdate();
     }
 
-    public final int updateAuthor(List<String> colNames, List<Object> colValues, String pkField)
-            throws ClassNotFoundException, SQLException {
-        //fix this later
-        //List<String> cols = new ArrayList();
-        //cols.add("author_name");
-        //cols.add("date_added");
-        //change cols back to colNames
-        return authorDao.updateAuthor(colNames, colValues, pkField);
+    public void addAuthor(String name)
+            throws Exception {
+        Author a = new Author();
+        a.setAuthorName(name);
+        Date createDate = new Date();
+        a.setDateAdded(createDate);     
+        em.getTransaction().begin();
+        em.persist(a);
+        em.getTransaction().commit();
+    }
+
+//    //updated method to reflect changes 
+//    public final List<Author> getAuthorList()throws Exception{       
+//        //List<Author> authorList = new ArrayList<>(); not necessary
+//        String jpql = "select a from Author a";
+//        TypedQuery<Author> q = getEm().createQuery(jpql, Author.class);
+//        q.setMaxResults(500);//optional
+//        //authorList = q.getResultList(); not necessary but still works 
+//        return q.getResultList();
+//    }
+//    public final int updateAuthor(List<String> colNames, List<Object> colValues, String pkField)
+//            throws ClassNotFoundException, SQLException {
+//        //fix this later
+//        //List<String> cols = new ArrayList();
+//        //cols.add("author_name");
+//        //cols.add("date_added");
+//        //change cols back to colNames
+//        return 0;
+//    }
+    
+        public void updateAuthor(String id, String name){
+        String jpql = "UPDATE Author a SET a.authorName = :name WHERE a.authorId = :id";
+        Query q = getEm().createQuery(jpql);
+        q.setParameter("author_id", new Integer(id));
+        q.setParameter("author_name", name);
+        q.executeUpdate();
     }
 
     public final Author findAuthorById(Object authorId)
@@ -55,46 +108,7 @@ public class AuthorService {
         if (authorId == null) {
             throw new IllegalArgumentException("You must enter a valid author Id");
         }
-        return authorDao.findAuthorById(authorId);
+        return null;
 
     }
-
-    public final IAuthorDao getAuthorDao() {
-        return authorDao;
-    }
-
-    public void setAuthorDao(IAuthorDao authorDao) {
-        this.authorDao = authorDao;
-    }
-
-//    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-//        IAuthorDao dao = new AuthorDao(
-//                "com.mysql.jdbc.Driver",
-//                "jdbc:mysql://localhost:3306/book",
-//                "root", "admin",
-//                new MySqlDataAccess()
-//        );
-//         AuthorService authorService = new AuthorService(dao);
-//        int recsUpdated = authorService.updateAuthor(Arrays.asList("author_name", "date_added"), 
-//                Arrays.asList("Destiny Cornell", "2017-10-07"), "25");
-//        
-        
-//        System.out.println("Records Updated: " + recsUpdated);
-//        
-   
-//        List<Object> vals = new ArrayList();
-//        vals.add("blah blah");
-//        vals.add(new Date());
-//        List<String> cols = new ArrayList();
-//        cols.add("author_name");
-//        cols.add("date_added");
-//        int recUpdate = authorService.updateAuthor(cols, vals, "6");
-//
-////        int recsDeleted = authorService.removeAuthorById("6");
-//
-//        List<Author> list = authorService.getAuthorList();
-//        for (Author a : list) {
-//            System.out.println(a.getAuthorId() + ", " + a.getAuthorName() + ", " + a.getDateAdded() + "\n");
-//        }
-    }
-
+}
