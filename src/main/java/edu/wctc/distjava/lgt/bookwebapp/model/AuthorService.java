@@ -49,14 +49,7 @@ public class AuthorService implements Serializable {
         q.setMaxResults(500); // optional
 
         return q.getResultList();
-    }    
-    
-    //another way to delete author
-    //wont use this because typically you wont be passing an author object from the controller
-//    public void removeAuthor(Author author){
-//        getEm().remove(getEm().merge(author));//merge it with what's in cache, once merged then you can remove it      
-//    }
-//    
+    }
 
     public int removeAuthorById(String id) throws Exception {
         String jpql = "delete from Author a where a.authorId = :id";
@@ -69,14 +62,28 @@ public class AuthorService implements Serializable {
             throws Exception {
         Author a = new Author();
         a.setAuthorName(name);
-        Date createDate = new Date();
-        a.setDateAdded(createDate);     
-        em.getTransaction().begin();
-        em.persist(a);
-        em.getTransaction().commit();
+        a.setDateAdded(new Date());
+        getEm().merge(a);
     }
 
-//    //updated method to reflect changes 
+    public void updateAuthor(String id, String name) {
+        Author a = getEm().find(Author.class, new Integer(id));
+        a.setAuthorName(name);
+        getEm().merge(a);
+    }
+
+    public final Author findAuthorById(Object authorId)
+            throws SQLException, ClassNotFoundException {
+        if (authorId == null) {
+            throw new IllegalArgumentException("You must enter a valid author Id");
+        }
+        int id = Integer.parseInt(authorId.toString());
+        Author a = getEm().find(Author.class, id);
+        return a;
+
+    }
+
+    //    //updated method to reflect changes 
 //    public final List<Author> getAuthorList()throws Exception{       
 //        //List<Author> authorList = new ArrayList<>(); not necessary
 //        String jpql = "select a from Author a";
@@ -94,21 +101,10 @@ public class AuthorService implements Serializable {
 //        //change cols back to colNames
 //        return 0;
 //    }
-    
-        public void updateAuthor(String id, String name){
-        String jpql = "UPDATE Author a SET a.authorName = :name WHERE a.authorId = :id";
-        Query q = getEm().createQuery(jpql);
-        q.setParameter("author_id", new Integer(id));
-        q.setParameter("author_name", name);
-        q.executeUpdate();
-    }
-
-    public final Author findAuthorById(Object authorId)
-            throws SQLException, ClassNotFoundException {
-        if (authorId == null) {
-            throw new IllegalArgumentException("You must enter a valid author Id");
-        }
-        return null;
-
-    }
+    //another way to delete author
+    //wont use this because typically you wont be passing an author object from the controller
+//    public void removeAuthor(Author author){
+//        getEm().remove(getEm().merge(author));//merge it with what's in cache, once merged then you can remove it      
+//    }
+//    
 }

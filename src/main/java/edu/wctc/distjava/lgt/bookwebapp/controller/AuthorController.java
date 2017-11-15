@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "AuthorController", urlPatterns = {"/authorController"})
 public class AuthorController extends HttpServlet {
-    
+
     @EJB
     private AuthorService authorService;
 
@@ -61,7 +61,7 @@ public class AuthorController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
         String destination = "/authorList.jsp";//default
         //dont use printwriter out b/c it overrides connection
         try {
@@ -73,7 +73,7 @@ public class AuthorController extends HttpServlet {
                 authorList = authorService.getAuthorList();
                 request.setAttribute("authorList", authorList);
                 getAuthorList(authorList, authorService, request);
-                
+
             } else if (action.equalsIgnoreCase(DELETE_ACTION)) {
                 String authorId = request.getParameter(AUTHOR_ID);
                 authorService.removeAuthorById(authorId);
@@ -84,59 +84,21 @@ public class AuthorController extends HttpServlet {
                 destination = DESTINATION_ADD_AUTHOR;
 
             } else if (action.equalsIgnoreCase(SUBMIT_AUTHOR_ACTION)) {
-                 String newName = request.getParameter(AUTHOR_NAME);
-                 String newDate = request.getParameter(DATE_ADDED);
-                 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-                 Date temp = sdf.parse(newDate);
-                 
-                 authorService.addAuthor(newName);
-                 
-                 destination = DESTINATION_AUTHOR_LIST;
-                      
-                 getAuthorList(authorList, authorService, request);
-                                           
-//                List<String> colNames = new ArrayList();
-//                colNames.add(AUTHOR_NAME);
-//                colNames.add(DATE_ADDED);
-//                
-//
-//                List<Object> colValues = new ArrayList();
-//                colValues.add(request.getParameter(AUTHOR_NAME));
-//                colValues.add(new Date());
-//
-//                authorService.addAuthor(colNames, colValues);
-//
-//                destination = DESTINATION_AUTHOR_LIST;
-//
-//                getAuthorList(authorList, authorService, request);
+                authorService.addAuthor(request.getParameter(AUTHOR_NAME));
+                destination = DESTINATION_AUTHOR_LIST;
+                getAuthorList(authorList, authorService, request);
 
             } else if (action.equalsIgnoreCase(EDIT_ACTION)) {
-
                 String authorId = request.getParameter(AUTHOR_ID);
-
                 destination = DESTINATION_EDIT_AUTHOR;
 
                 Author eAuthor = authorService.findAuthorById(authorId);
                 request.setAttribute("eAuthor", eAuthor);
 
             } else if (action.equalsIgnoreCase(EDIT)) {
-                //add 
-                List<String> colNames = new ArrayList();
-                colNames.add(AUTHOR_NAME);
-                colNames.add(DATE_ADDED);
-
-                List<Object> colValues = new ArrayList(); 
-                colValues.add(request.getParameter(AUTHOR_NAME));
-                colValues.add(new Date());
-
-                String authorId = request.getParameter(AUTHORID);
-
-                authorService.updateAuthor(AUTHOR_NAME, DATE_ADDED);
-
+                authorService.updateAuthor(request.getParameter(AUTHORID), request.getParameter(AUTHOR_NAME));
                 destination = DESTINATION_AUTHOR_LIST;
-
                 getAuthorList(authorList, authorService, request);
-
             }
 
         } catch (Exception e) {
@@ -154,10 +116,10 @@ public class AuthorController extends HttpServlet {
         authorList = authServ.getAuthorList();
         request.setAttribute("authorList", authorList);
 
-   }
-    
-    @Override 
-    public void init() throws ServletException{
+    }
+
+    @Override
+    public void init() throws ServletException {
 
     }
 
