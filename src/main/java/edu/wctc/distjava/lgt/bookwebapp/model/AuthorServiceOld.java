@@ -22,7 +22,7 @@ import javax.persistence.TypedQuery;
  * @author Leslee
  */
 @Stateless
-public class AuthorService implements Serializable {
+public class AuthorServiceOld implements Serializable {
 
     private final String AUTHOR_TBL = "author";
     private final String AUTHOR_PK = "author_id";
@@ -38,7 +38,7 @@ public class AuthorService implements Serializable {
         this.em = em;
     }
 
-    public AuthorService() {
+    public AuthorServiceOld() {
     }
 
     // Updated for JPA

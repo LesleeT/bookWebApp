@@ -6,7 +6,7 @@
 package edu.wctc.distjava.lgt.bookwebapp.controller;
 
 import edu.wctc.distjava.lgt.bookwebapp.model.Author;
-import edu.wctc.distjava.lgt.bookwebapp.model.AuthorService;
+import edu.wctc.distjava.lgt.bookwebapp.model.AuthorServiceOld;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthorController extends HttpServlet {
 
     @EJB
-    private AuthorService authorService;
+    private AuthorServiceOld authorService;
 
     public static final String ACTION = "action";
     public static final String LIST_ACTION = "list";
@@ -111,7 +111,7 @@ public class AuthorController extends HttpServlet {
         view.forward(request, response);
     }
 
-    public void getAuthorList(List<Author> authorList, AuthorService authServ, HttpServletRequest request)
+    public void getAuthorList(List<Author> authorList, AuthorServiceOld authServ, HttpServletRequest request)
             throws SQLException, ClassNotFoundException, Exception {
         authorList = authServ.getAuthorList();
         request.setAttribute("authorList", authorList);
