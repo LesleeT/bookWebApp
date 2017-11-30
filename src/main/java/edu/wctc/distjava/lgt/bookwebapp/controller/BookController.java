@@ -7,15 +7,12 @@ package edu.wctc.distjava.lgt.bookwebapp.controller;
 
 import edu.wctc.distjava.lgt.bookwebapp.model.Author;
 import edu.wctc.distjava.lgt.bookwebapp.model.AuthorService;
+import edu.wctc.distjava.lgt.bookwebapp.model.Book;
+import edu.wctc.distjava.lgt.bookwebapp.model.BookFacade;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -28,11 +25,13 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Leslee
  */
-@WebServlet(name = "AuthorController", urlPatterns = {"/authorController"})
-public class AuthorController extends HttpServlet {
+@WebServlet(name = "BookController", urlPatterns = {"/BookController"})
+public class BookController extends HttpServlet {
 
     @EJB
     private AuthorService authorService;
+    @EJB
+    private BookFacade bookFacade;
 
     public static final String ACTION = "action";
     public static final String LIST_ACTION = "list";
@@ -40,15 +39,20 @@ public class AuthorController extends HttpServlet {
     public static final String ADD_ACTION = "add";
     public static final String DELETE_ACTION = "delete";
     public static final String EDIT_ACTION = "edit";
-    public static final String SUBMIT_AUTHOR_ACTION = "submitauthor";
-    public static final String EDIT = "editAuthor";
-    public static final String AUTHOR_NAME = "author_name";
+    public static final String SUBMIT_BOOK_ACTION = "submitbook";
+    public static final String EDIT_BOOK_ACTION = "editbook";
+    public static final String TITLE = "title";
     public static final String DATE_ADDED = "date_added";
     public static final String AUTHORID = "author_id";
+    public static final String BOOKID = "book_id";
+    public static final String ISBN = "isbn";
+    public static final String AUTHOR = "author";
 
-    public static final String DESTINATION_AUTHOR_LIST = "/authorList.jsp";
-    public static final String DESTINATION_ADD_AUTHOR = "/addAuthor.jsp";
-    public static final String DESTINATION_EDIT_AUTHOR = "/editAuthor.jsp";
+    public static final String DESTINATION_HOME = "/index.jsp";
+    public static final String DESTINATION_BOOKLIST = "/bookList.jsp";
+    public static final String DESTINATION_ADD_BOOK = "/addBook.jsp";
+    public static final String DESTINATION_EDIT_BOOK = "/editBook.jsp";
+    public static final String DESTINATION_ERROR = "/error.jsp";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -62,49 +66,64 @@ public class AuthorController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String destination = "/authorList.jsp";//default
-        //dont use printwriter out b/c it overrides connection
+        String destination = "/bookList.jsp";
         try {
 
-            List<Author> authorList = null;
+            List<Book> bookList = null;
             String action = request.getParameter(ACTION);//key in the jsp page
-   
 
             if (action.equalsIgnoreCase(LIST_ACTION)) {
-                authorList = authorService.findAll();
-                request.setAttribute("authorList", authorList);
-                getAuthorList(authorList, authorService, request);
+                bookList = bookFacade.findAll();
+                request.setAttribute("bookList", bookList);
+                //getBookList(bookList, bookFacade, request);
 
             } else if (action.equalsIgnoreCase(DELETE_ACTION)) {
-                String authorId = request.getParameter(AUTHOR_ID);
-                authorService.removeAuthorById(authorId);
-
-                getAuthorList(authorList, authorService, request);
+                String bookId = request.getParameter(BOOKID);
+                bookFacade.removeBookById(bookId);
+                getBookList(bookList, bookFacade, request);
 
             } else if (action.equalsIgnoreCase(ADD_ACTION)) {
-                destination = DESTINATION_ADD_AUTHOR;
 
-            } else if (action.equalsIgnoreCase(SUBMIT_AUTHOR_ACTION)) {
-                authorService.addAuthor(request.getParameter(AUTHOR_NAME));
-                destination = DESTINATION_AUTHOR_LIST;
-                getAuthorList(authorList, authorService, request);
+                List<Author> authorList = authorService.findAll();
+                request.setAttribute("authorList", authorList);
+                destination = DESTINATION_ADD_BOOK;
+
+            } else if (action.equalsIgnoreCase(SUBMIT_BOOK_ACTION)) {
+                String title = request.getParameter(TITLE);
+                String isbn = request.getParameter(ISBN);
+                String authorId = request.getParameter(AUTHOR);
+                bookFacade.addBook(title, isbn, authorId);
+
+                destination = DESTINATION_BOOKLIST;
+
+                getBookList(bookList, bookFacade, request);
 
             } else if (action.equalsIgnoreCase(EDIT_ACTION)) {
-                //int authorId = Integer.parseInt(id);
-                String authorId = request.getParameter(AUTHOR_ID);
-                destination = DESTINATION_EDIT_AUTHOR;
 
-                Author eAuthor = authorService.findById(new Integer(authorId));
-                request.setAttribute("eAuthor", eAuthor);
+                destination = DESTINATION_EDIT_BOOK;
 
-            } else if (action.equalsIgnoreCase(EDIT)) {
-                authorService.updateAuthor(request.getParameter(AUTHORID), request.getParameter(AUTHOR_NAME));
-                destination = DESTINATION_AUTHOR_LIST;
-                getAuthorList(authorList, authorService, request);
+                String bookId = request.getParameter(BOOKID);
+                Book eBook = bookFacade.findById(new Integer(bookId));
+                request.setAttribute("eBook", eBook);
+
+                List<Author> authorList = authorService.findAll();
+                request.setAttribute("editAuthorList", authorList);
+
+            } else if (action.equalsIgnoreCase(EDIT_BOOK_ACTION)) {
+
+                destination = DESTINATION_BOOKLIST;
+                String id = request.getParameter(BOOKID);
+                String title = request.getParameter(TITLE);
+                String isbn = request.getParameter(ISBN);
+                String authorId = request.getParameter(AUTHOR); //only the author Id is passed in
+
+                bookFacade.updateBook(id, title, isbn, authorId);//pass in the values from the form
+
+                getBookList(bookList, bookFacade, request);
             }
 
         } catch (Exception e) {
-            System.out.println("CAUGHT");
+            //System.out.println("CAUGHT");
             //destination = "/authorList.jsp";
             request.setAttribute("errMessage", e.getMessage());
         }
@@ -113,10 +132,10 @@ public class AuthorController extends HttpServlet {
         view.forward(request, response);
     }
 
-    public void getAuthorList(List<Author> authorList, AuthorService authServ, HttpServletRequest request)
+    public void getBookList(List<Book> bookList, BookFacade bf, HttpServletRequest request)
             throws SQLException, ClassNotFoundException, Exception {
-        authorList = authServ.findAll();
-        request.setAttribute("authorList", authorList);
+        bookList = bf.findAll();
+        request.setAttribute("bookList", bookList);
 
     }
 
