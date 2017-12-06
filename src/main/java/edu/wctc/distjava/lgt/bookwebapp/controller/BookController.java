@@ -8,18 +8,21 @@ package edu.wctc.distjava.lgt.bookwebapp.controller;
 import edu.wctc.distjava.lgt.bookwebapp.model.Author;
 import edu.wctc.distjava.lgt.bookwebapp.model.AuthorService;
 import edu.wctc.distjava.lgt.bookwebapp.model.Book;
-import edu.wctc.distjava.lgt.bookwebapp.model.BookFacade;
+import edu.wctc.distjava.lgt.bookwebapp.model.BookService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
@@ -28,10 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "BookController", urlPatterns = {"/BookController"})
 public class BookController extends HttpServlet {
 
-    @EJB
     private AuthorService authorService;
-    @EJB
-    private BookFacade bookFacade;
+    private BookService bookService;
 
     public static final String ACTION = "action";
     public static final String LIST_ACTION = "list";
@@ -73,14 +74,14 @@ public class BookController extends HttpServlet {
             String action = request.getParameter(ACTION);//key in the jsp page
 
             if (action.equalsIgnoreCase(LIST_ACTION)) {
-                bookList = bookFacade.findAll();
+                bookList = bookService.findAll();
                 request.setAttribute("bookList", bookList);
-                //getBookList(bookList, bookFacade, request);
+                getBookList(bookList, bookService, request);
 
             } else if (action.equalsIgnoreCase(DELETE_ACTION)) {
                 String bookId = request.getParameter(BOOKID);
-                bookFacade.removeBookById(bookId);
-                getBookList(bookList, bookFacade, request);
+                bookService.removeBookById(bookId);
+                getBookList(bookList, bookService, request);
 
             } else if (action.equalsIgnoreCase(ADD_ACTION)) {
 
@@ -92,18 +93,19 @@ public class BookController extends HttpServlet {
                 String title = request.getParameter(TITLE);
                 String isbn = request.getParameter(ISBN);
                 String authorId = request.getParameter(AUTHOR);
-                bookFacade.addBook(title, isbn, authorId);
-
+                System.out.println(title + isbn + authorId);
+                bookService.addNewBook(title, isbn, authorId);
+                
                 destination = DESTINATION_BOOKLIST;
 
-                getBookList(bookList, bookFacade, request);
+                getBookList(bookList, bookService, request);
 
             } else if (action.equalsIgnoreCase(EDIT_ACTION)) {
 
                 destination = DESTINATION_EDIT_BOOK;
 
                 String bookId = request.getParameter(BOOKID);
-                Book eBook = bookFacade.findById(new Integer(bookId));
+                Book eBook = bookService.findById(bookId);
                 request.setAttribute("eBook", eBook);
 
                 List<Author> authorList = authorService.findAll();
@@ -115,11 +117,11 @@ public class BookController extends HttpServlet {
                 String id = request.getParameter(BOOKID);
                 String title = request.getParameter(TITLE);
                 String isbn = request.getParameter(ISBN);
-                String authorId = request.getParameter(AUTHOR); //only the author Id is passed in
+                String authorId = request.getParameter(AUTHOR); 
 
-                bookFacade.updateBook(id, title, isbn, authorId);//pass in the values from the form
+                bookService.updateBook(id, title, isbn, authorId);
 
-                getBookList(bookList, bookFacade, request);
+                getBookList(bookList, bookService, request);
             }
 
         } catch (Exception e) {
@@ -132,7 +134,7 @@ public class BookController extends HttpServlet {
         view.forward(request, response);
     }
 
-    public void getBookList(List<Book> bookList, BookFacade bf, HttpServletRequest request)
+    public void getBookList(List<Book> bookList, BookService bf, HttpServletRequest request)
             throws SQLException, ClassNotFoundException, Exception {
         bookList = bf.findAll();
         request.setAttribute("bookList", bookList);
@@ -141,43 +143,46 @@ public class BookController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-
+      ServletContext sctx = getServletContext();
+        
+        WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        bookService = (BookService) ctx.getBean("bookService");
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+//    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+//    /**
+//     * Handles the HTTP <code>GET</code> method.
+//     *
+//     * @param request servlet request
+//     * @param response servlet response
+//     * @throws ServletException if a servlet-specific error occurs
+//     * @throws IOException if an I/O error occurs
+//     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+//
+//    /**
+//     * Handles the HTTP <code>POST</code> method.
+//     *
+//     * @param request servlet request
+//     * @param response servlet response
+//     * @throws ServletException if a servlet-specific error occurs
+//     * @throws IOException if an I/O error occurs
+//     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
+//
+//    /**
+//     * Returns a short description of the servlet.
+//     *
+//     * @return a String containing servlet description
+//     */
     @Override
     public String getServletInfo() {
         return "Short description";

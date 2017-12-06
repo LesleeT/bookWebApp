@@ -18,11 +18,14 @@ import java.util.List;
 import java.util.Vector;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
@@ -31,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "AuthorController", urlPatterns = {"/authorController"})
 public class AuthorController extends HttpServlet {
 
-    @EJB
     private AuthorService authorService;
 
     public static final String ACTION = "action";
@@ -94,7 +96,7 @@ public class AuthorController extends HttpServlet {
                 String authorId = request.getParameter(AUTHOR_ID);
                 destination = DESTINATION_EDIT_AUTHOR;
 
-                Author eAuthor = authorService.findById(new Integer(authorId));
+                Author eAuthor = authorService.findById(authorId);
                 request.setAttribute("eAuthor", eAuthor);
 
             } else if (action.equalsIgnoreCase(EDIT)) {
@@ -122,6 +124,10 @@ public class AuthorController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
+        ServletContext sctx = getServletContext();
+        
+        WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        authorService = (AuthorService) ctx.getBean("authorService");
 
     }
 
