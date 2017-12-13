@@ -26,9 +26,9 @@
                     <form method ="POST" 
                           action = "${pageContext.request.contextPath}/authorController?action=editAuthor">
 
-                        <input type="hidden" name="author_id" value="${eAuthor.authorId}">
+                        <input type="hidden" name="authorId" value="${eAuthor.authorId}">
                         Author name:
-                        <input type="text" name="author_name" value="${eAuthor.authorName}">
+                        <input type="text" name="authorName" value="${eAuthor.authorName}">
                         Date added:
                         <input type="text" name="date_added" value="${eAuthor.dateAdded}">
 

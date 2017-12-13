@@ -115,9 +115,9 @@ public class BookController extends HttpServlet {
                 String id = request.getParameter(BOOKID);
                 String title = request.getParameter(TITLE);
                 String isbn = request.getParameter(ISBN);
-                String authorId = request.getParameter(AUTHOR); //only the author Id is passed in
+                String authorId = request.getParameter(AUTHOR); 
 
-                bookFacade.updateBook(id, title, isbn, authorId);//pass in the values from the form
+                bookFacade.updateBook(id, title, isbn, authorId);
 
                 getBookList(bookList, bookFacade, request);
             }
@@ -139,10 +139,10 @@ public class BookController extends HttpServlet {
 
     }
 
-    @Override
-    public void init() throws ServletException {
-
-    }
+//    @Override
+//    public void init() throws ServletException {
+//
+//    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
