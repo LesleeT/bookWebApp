@@ -9,6 +9,7 @@ import edu.wctc.distjava.lgt.bookwebapp.model.Author;
 import edu.wctc.distjava.lgt.bookwebapp.model.AuthorService;
 import edu.wctc.distjava.lgt.bookwebapp.model.Book;
 import edu.wctc.distjava.lgt.bookwebapp.model.BookService;
+import edu.wctc.distjava.lgt.bookwebapp.repository.BookRepository;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -33,6 +34,7 @@ public class BookController extends HttpServlet {
 
     private AuthorService authorService;
     private BookService bookService;
+    //private BookRepository br;
 
     public static final String ACTION = "action";
     public static final String LIST_ACTION = "list";
@@ -45,9 +47,11 @@ public class BookController extends HttpServlet {
     public static final String TITLE = "title";
     public static final String DATE_ADDED = "date_added";
     public static final String AUTHORID = "author_id";
-    public static final String BOOKID = "book_id";
+    public static final String BOOK_ID = "book_id";
+    public static final String BOOKID = "bookId";
     public static final String ISBN = "isbn";
     public static final String AUTHOR = "author";
+    public static final String AUTHOR_NAME = "authorName";
 
     public static final String DESTINATION_HOME = "/index.jsp";
     public static final String DESTINATION_BOOKLIST = "/bookList.jsp";
@@ -71,6 +75,9 @@ public class BookController extends HttpServlet {
         try {
 
             List<Book> bookList = null;
+            //List<Author> authorList = null;
+            // authorList = authorService.findAll();
+            // request.setAttribute("authorList", authorList);
             String action = request.getParameter(ACTION);//key in the jsp page
 
             if (action.equalsIgnoreCase(LIST_ACTION)) {
@@ -81,30 +88,32 @@ public class BookController extends HttpServlet {
             } else if (action.equalsIgnoreCase(DELETE_ACTION)) {
                 String bookId = request.getParameter(BOOKID);
                 bookService.removeBookById(bookId);
+
                 getBookList(bookList, bookService, request);
 
             } else if (action.equalsIgnoreCase(ADD_ACTION)) {
+                
 
+                destination = DESTINATION_ADD_BOOK;
+                //br.getListOfAuthorNames();
+                // request.setAttribute("authorList", authorService.findAll());
                 List<Author> authorList = authorService.findAll();
                 request.setAttribute("authorList", authorList);
-                destination = DESTINATION_ADD_BOOK;
 
             } else if (action.equalsIgnoreCase(SUBMIT_BOOK_ACTION)) {
                 String title = request.getParameter(TITLE);
                 String isbn = request.getParameter(ISBN);
                 String authorId = request.getParameter(AUTHOR);
-                System.out.println(title + isbn + authorId);
                 bookService.addNewBook(title, isbn, authorId);
-                
+
                 destination = DESTINATION_BOOKLIST;
 
                 getBookList(bookList, bookService, request);
 
             } else if (action.equalsIgnoreCase(EDIT_ACTION)) {
-
                 destination = DESTINATION_EDIT_BOOK;
-
                 String bookId = request.getParameter(BOOKID);
+
                 Book eBook = bookService.findById(bookId);
                 request.setAttribute("eBook", eBook);
 
@@ -112,15 +121,14 @@ public class BookController extends HttpServlet {
                 request.setAttribute("editAuthorList", authorList);
 
             } else if (action.equalsIgnoreCase(EDIT_BOOK_ACTION)) {
-
-                destination = DESTINATION_BOOKLIST;
-                String id = request.getParameter(BOOKID);
+                String id = request.getParameter(BOOK_ID);
                 String title = request.getParameter(TITLE);
                 String isbn = request.getParameter(ISBN);
-                String authorId = request.getParameter(AUTHOR); 
+                String authorId = request.getParameter(AUTHORID);
 
                 bookService.updateBook(id, title, isbn, authorId);
 
+                destination = DESTINATION_BOOKLIST;
                 getBookList(bookList, bookService, request);
             }
 
@@ -143,10 +151,11 @@ public class BookController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-      ServletContext sctx = getServletContext();
-        
+        ServletContext sctx = getServletContext();
+
         WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(sctx);
         bookService = (BookService) ctx.getBean("bookService");
+        authorService = (AuthorService) ctx.getBean("authorService");
     }
 
 //    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -172,6 +181,7 @@ public class BookController extends HttpServlet {
 //     * @throws ServletException if a servlet-specific error occurs
 //     * @throws IOException if an I/O error occurs
 //     */
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -183,6 +193,7 @@ public class BookController extends HttpServlet {
 //     *
 //     * @return a String containing servlet description
 //     */
+
     @Override
     public String getServletInfo() {
         return "Short description";

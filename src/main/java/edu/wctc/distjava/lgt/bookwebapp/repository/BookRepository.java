@@ -1,5 +1,6 @@
 package edu.wctc.distjava.lgt.bookwebapp.repository;
 
+import edu.wctc.distjava.lgt.bookwebapp.model.Author;
 import edu.wctc.distjava.lgt.bookwebapp.model.Book;
 import java.io.Serializable;
 import java.util.List;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Repository;
  * @author jlombardo
  */
 @Repository
-public interface BookRepository extends JpaRepository<Book, Integer>, Serializable {
+public interface BookRepository extends JpaRepository<Book, Integer>, Serializable {  
+//    @Query("SELECT a.authorName, a.authorId FROM Author a")
+//   public abstract List<Author> getListOfAuthorNames();     
     
 }

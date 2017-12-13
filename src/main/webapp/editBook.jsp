@@ -7,7 +7,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -40,7 +41,8 @@
                         </div>
                         <div class="form-group">
                             <label for="author">Author:</label>
-                            <select class="form-control" id="author" name="author">
+                            <!--the issue is here-->
+                            <select class="form-control" id="authorId" name="author">
                                 <c:forEach var="a" items="${editAuthorList}">
                                     <option value="${a.authorId}">                                        
                                         ${a.authorName}
