@@ -27,11 +27,12 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "BookController", urlPatterns = {"/BookController"})
 public class BookController extends HttpServlet {
-
-    @EJB
-    private AuthorService authorService;
     @EJB
     private BookFacade bookFacade;
+    
+    @EJB
+    private AuthorService authorService;
+
 
     public static final String ACTION = "action";
     public static final String LIST_ACTION = "list";
@@ -91,7 +92,7 @@ public class BookController extends HttpServlet {
             } else if (action.equalsIgnoreCase(SUBMIT_BOOK_ACTION)) {
                 String title = request.getParameter(TITLE);
                 String isbn = request.getParameter(ISBN);
-                String authorId = request.getParameter(AUTHOR);
+                String authorId = request.getParameter(AUTHOR_ID);
                 bookFacade.addBook(title, isbn, authorId);
 
                 destination = DESTINATION_BOOKLIST;
