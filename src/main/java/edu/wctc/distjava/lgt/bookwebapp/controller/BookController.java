@@ -27,11 +27,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "BookController", urlPatterns = {"/BookController"})
 public class BookController extends HttpServlet {
-    @EJB
-    private BookFacade bookFacade;
+
     
     @EJB
     private AuthorService authorService;
+    
+    @EJB
+    private BookFacade bookFacade;
 
 
     public static final String ACTION = "action";
@@ -45,7 +47,7 @@ public class BookController extends HttpServlet {
     public static final String TITLE = "title";
     public static final String DATE_ADDED = "date_added";
     public static final String AUTHORID = "author_id";
-    public static final String BOOKID = "book_id";
+    public static final String BOOKID = "bookId";
     public static final String ISBN = "isbn";
     public static final String AUTHOR = "author";
 
@@ -70,7 +72,7 @@ public class BookController extends HttpServlet {
         String destination = "/bookList.jsp";
         try {
 
-            List<Book> bookList = null;
+            List <Book> bookList = null;
             String action = request.getParameter(ACTION);//key in the jsp page
 
             if (action.equalsIgnoreCase(LIST_ACTION)) {
@@ -85,14 +87,14 @@ public class BookController extends HttpServlet {
 
             } else if (action.equalsIgnoreCase(ADD_ACTION)) {
 
-                List<Author> authorList = authorService.findAll();
+                List <Author> authorList = authorService.findAll();
                 request.setAttribute("authorList", authorList);
                 destination = DESTINATION_ADD_BOOK;
 
             } else if (action.equalsIgnoreCase(SUBMIT_BOOK_ACTION)) {
                 String title = request.getParameter(TITLE);
                 String isbn = request.getParameter(ISBN);
-                String authorId = request.getParameter(AUTHOR_ID);
+                String authorId = request.getParameter(AUTHOR);
                 bookFacade.addBook(title, isbn, authorId);
 
                 destination = DESTINATION_BOOKLIST;
@@ -107,7 +109,7 @@ public class BookController extends HttpServlet {
                 Book eBook = bookFacade.findById(new Integer(bookId));
                 request.setAttribute("eBook", eBook);
 
-                List<Author> authorList = authorService.findAll();
+                List <Author> authorList = authorService.findAll();
                 request.setAttribute("editAuthorList", authorList);
 
             } else if (action.equalsIgnoreCase(EDIT_BOOK_ACTION)) {
@@ -116,7 +118,7 @@ public class BookController extends HttpServlet {
                 String id = request.getParameter(BOOKID);
                 String title = request.getParameter(TITLE);
                 String isbn = request.getParameter(ISBN);
-                String authorId = request.getParameter(AUTHOR); 
+                String authorId = request.getParameter(AUTHOR);
 
                 bookFacade.updateBook(id, title, isbn, authorId);
 
@@ -139,11 +141,6 @@ public class BookController extends HttpServlet {
         request.setAttribute("bookList", bookList);
 
     }
-
-//    @Override
-//    public void init() throws ServletException {
-//
-//    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

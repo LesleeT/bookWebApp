@@ -6,6 +6,7 @@
 package edu.wctc.distjava.lgt.bookwebapp.model;
 
 import java.sql.SQLException;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -48,6 +49,13 @@ public class BookFacade extends AbstractFacade<Book> {
         
         getEm().merge(book);
     }
+    
+       public List getListBooksFromAuthor(String id){
+       String jpsql = "SELECT b FROM Book b WHERE b.authorEntity.authorId = :id";
+       Query qe = this.getEm().createQuery(jpsql);
+       qe.setParameter("id", new Integer(id));
+       return qe.getResultList();
+   }
     
      public int removeBookById(String id)
         throws SQLException, ClassNotFoundException, NumberFormatException{
