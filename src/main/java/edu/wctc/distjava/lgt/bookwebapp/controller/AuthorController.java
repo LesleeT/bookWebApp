@@ -69,8 +69,7 @@ public class AuthorController extends HttpServlet {
         try {
 
             List<Author> authorList = null;
-            String action = request.getParameter(ACTION);//key in the jsp page
-   
+            String action = request.getParameter(ACTION);//key in the jsp page   
 
             if (action.equalsIgnoreCase(LIST_ACTION)) {
                 authorList = authorService.findAll();

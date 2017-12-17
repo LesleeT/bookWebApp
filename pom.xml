@@ -9,7 +9,7 @@
 
     <name>bookWebApp</name>
 
-        <properties>
+    <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <querydsl.generated.src>target/generated-sources/java</querydsl.generated.src>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
